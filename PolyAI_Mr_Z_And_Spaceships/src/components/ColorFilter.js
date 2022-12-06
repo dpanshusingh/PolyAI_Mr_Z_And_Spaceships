@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react';
 
 function ColorFilter({ selectedColors, colorSelector, setColorSelector, setSelectedColors}) {
-  // const colors = [{'red':false, 'blue':false, 'yellow':false, 'orange':false, 'green':false, 'violet':false}];
+  const colors = ['red', 'blue', 'yellow', 'orange'];
 
   const handleSelectColor = e => {
     if (e.target.checked) {
@@ -23,19 +23,20 @@ function ColorFilter({ selectedColors, colorSelector, setColorSelector, setSelec
   return (
     <FormControl>
       <FormLabel>Colours</FormLabel>
-      <Select defaultValue={"all"} onChange={e => {setColorSelector(e.target.value)}}>
+      <Select value={colorSelector} onChange={e => {setColorSelector(e.target.value)}}>
         <option value="all">All of</option>
         <option value="any">Any of</option>
         <option value="non">None of</option>
       </Select>
       <SimpleGrid columns={3} columnGap={3} rowGap={3} w="full">
-        {Object.keys(selectedColors).map(color => (
+      {colors.map(color => (
           <GridItem colSpan={1}>
             <Checkbox
               onChange={e => { handleSelectColor(e)}}
+              value={color}
               defaultChecked={selectedColors[0][color]}
             >
-              {color.toUpperCase() + color.substring(1)}
+              {color[0].toUpperCase() + color.substring(1)}
             </Checkbox>
           </GridItem>
         ))}

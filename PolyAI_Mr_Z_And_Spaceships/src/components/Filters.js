@@ -22,7 +22,7 @@ import LaserFilter from './LaserFilter';
 function Filters() {
   const [searchParams, setSearchParams] = useSearchParams();
   
-  let selectedColorsUrl = [{}];
+  let selectedColorsUrl = [{'red':false, 'blue':false, 'yellow':false, 'orange':false, 'green':false, 'violet':false}];
   
   let speedSelectorUrl = 'gr';
   if(searchParams.get("speed")){
@@ -41,10 +41,8 @@ function Filters() {
   let selectedColoursFromUrl = []
   if(searchParams.get("color")){
     selectedColoursFromUrl = searchParams.get("color").split(',');
-    // console.log(selectedColoursFromUrl);
     for (let i = 0; i < selectedColoursFromUrl.length; i++) {
       selectedColorsUrl[0][selectedColoursFromUrl[i]] = true;
-      console.log(selectedColoursFromUrl[i]);
   }
   }
   
@@ -53,7 +51,7 @@ function Filters() {
     dateSelectorUrl = searchParams.get("date").substring(0, 2);
   }
 
-  let manuDateUrl = "";
+  let manuDateUrl = "'01-01-2001'";
   if(searchParams.get("date")){
     manuDateUrl = searchParams.get("date").substring(2, 12);
   }
@@ -66,7 +64,7 @@ function Filters() {
   const [queryString, setQueryString] = useState('');
 
   const [colorSelector, setColorSelector] = useState(colorSelectorUrl,'all');
-  const [selectedColors, setSelectedColors] = useState(selectedColorsUrl,[{'red':false, 'blue':false, 'yellow':false, 'orange':false, 'green':false, 'violet':false}]);
+  const [selectedColors, setSelectedColors] = useState(selectedColoursFromUrl,['red', 'blue', 'yellow', 'orange']);
   const [speedSelector, setSpeedSelector] = useState(speedSelectorUrl,'gr');
   const [selectedMaxSpeed, setSelectedMaxSpeed] = useState(selectedMaxSpeedUrl,'');
   const [dateSelector, setDateSelector] = useState(dateSelectorUrl,'af');
@@ -106,7 +104,7 @@ function Filters() {
   }, [speedSelector]);
     
     
-    useEffect(() => {
+  useEffect(() => {
       if(selectedMaxSpeedUrl != selectedMaxSpeed){
         searchParams.set("speed",speedSelector + selectedMaxSpeed);
         setSearchParams(searchParams);
@@ -114,58 +112,25 @@ function Filters() {
       buildQueryString();
     }, [selectedMaxSpeed]);
 
-  // useEffect(() => {
-  //   // setSelectedColors(selectedColors => [...selectedColors, searchParams.get("color")]);
-  // }, [searchParams]);
-
   useEffect(() => {
     if(colorSelectorUrl != colorSelector){
       searchParams.set("colorSel", colorSelector);
       setSearchParams(searchParams);
     }
   }, [colorSelector]);
-
-  let selectedColorsQuery = Object.values(selectedColors[0])
-  .filter((key) => key == true)
-  .reduce((obj, key) => {
-      return Object.assign(obj, 
-        [key]
-      );
-}, {});
-
   useEffect(() => {
     if(selectedColorsUrl != selectedColors){
       searchParams.set("color", selectedColors);
-      console.log(selectedColors);
       setSearchParams(searchParams);
     }
-    // buildQueryString();
   }, [selectedColors]);
 
   const buildQueryString = () => {
     let query = '/spaceships?';
-
-    // Colors
-
-//     let selectedColorsQuery = Object.values(selectedColors[0])
-//   .filter((key) => key == true)
-//   .reduce((obj, key) => {
-//       return Object.assign(obj, 
-//         [key]
-//       );
-// }, {});
     if (selectedColors.length > 0) {
-      const selectedColorsQuery = Object.values(selectedColors[0])
-      .filter((key) => key == true)
-      .reduce((obj, key) => {
-          return Object.assign(obj, 
-            [key]
-          );
-    }, {});
-      console.log(selectedColorsQuery);
       query += 'colorSel=' + colorSelector + '&color=';
-      query += selectedColorsQuery[0];
-      // selectedColorsQuery.slice(1,selectedColors.length+1).forEach(color => (query += '%2C' + color));
+      query += selectedColors[0];
+      selectedColors.slice(1,selectedColors.length+1).forEach(color => (query += '%2C' + color));
     }
 
     // Max Speed
@@ -206,7 +171,7 @@ function Filters() {
       <SimpleGrid columns={2} columnGap={3} rowGap={6} w="full">
         <GridItem colSpan={1}>
           <ColorFilter
-            selectedColors={selectedColors}
+            selectedColors={selectedColorsUrl}
             colorSelector={colorSelector}
             setColorSelector={setColorSelector}
             setSelectedColors={setSelectedColors}
